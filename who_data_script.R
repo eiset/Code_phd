@@ -8,6 +8,125 @@
 
 library(dplyr)
 
+# Funktion: Risikofaktorer - mean --------------------------------------------------------------
+# http://apps.who.int/gho/data/node.main.A867?lang=en
+
+RiskFactor <- function(path) {
+        t <- read.csv(path, stringsAsFactor = FALSE)
+        t <- filter(t, COUNTRY..DISPLAY. %in% c("Denmark",
+                                             "Algeria",
+                                             "Egypt",
+                                             "Libya",
+                                             "Morocco",
+                                             "Sudan",
+                                             "Tunisia",
+                                             "Bahrain",
+                                             "United Arab Emirates",
+                                             "Iraq",
+                                             "Iran",
+                                             "Jordan",
+                                             "Kuwait",
+                                             "Lebanon",
+                                             "Oman",
+                                             "Saudi Arabia",
+                                             "Syrian Arab Republic",
+                                             "Turkey",
+                                             "Yemen",
+                                             "Qatar")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                       YEAR..CODE.,
+                       REGION..CODE.,
+                       COUNTRY..CODE.,
+                       COUNTRY..DISPLAY.,
+                       SEX..CODE.,
+                       Numeric,
+                       Low,
+                       High,
+                       Display.Value) %>%
+                arrange(Numeric)
+        names(t) <- tolower(names(t))
+        t
+}
+
+mean.bmi <- RiskFactor("./who_mean_bmi.csv") %>%
+        filter(sex..code. == "BTSX")
+
+mean.fasting.glucose <- RiskFactor("./who_mean_fasting_glucose.csv")
+
+mean.sys.bp <- RiskFactor("./who_mean_sys_bp.csv") %>%
+        filter(sex..code. == "BTSX")
+
+mean.colestrl <- RiskFactor("./who_mean_tot_cholest.csv")
+
+# Funktion: Risikofaktorer - procent af beflokning --------------------------------------------------------------
+# http://apps.who.int/gho/data/node.main.A867?lang=en
+
+RiskFactor <- function(path) {
+        t <- read.csv(path, stringsAsFactor = FALSE)
+        t <- filter(t, COUNTRY..DISPLAY. %in% c("Denmark",
+                                                "Algeria",
+                                                "Egypt",
+                                                "Libya",
+                                                "Morocco",
+                                                "Sudan",
+                                                "Tunisia",
+                                                "Bahrain",
+                                                "United Arab Emirates",
+                                                "Iraq",
+                                                "Iran",
+                                                "Jordan",
+                                                "Kuwait",
+                                                "Lebanon",
+                                                "Oman",
+                                                "Saudi Arabia",
+                                                "Syrian Arab Republic",
+                                                "Turkey",
+                                                "Yemen",
+                                                "Qatar")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                       YEAR..CODE.,
+                       REGION..CODE.,
+                       COUNTRY..CODE.,
+                       COUNTRY..DISPLAY.,
+                       SEX..CODE.,
+                       Numeric,
+                       Low,
+                       High,
+                       Display.Value) %>%
+                arrange(Numeric)
+        names(t) <- tolower(names(t))
+        t
+}
+
+# Overweight: BMI >= 25
+overweight <- RiskFactor("./who_overweight_bmi25or_above.csv") %>%
+        filter(sex..code. == "BTSX")
+
+# Obesity: BMI >= 30
+obesity <- RiskFactor("./who_obesity_bmi30or_above.csv") %>%
+        filter(sex..code. == "BTSX")
+
+# Raised blood pressure: systolic >= 140 and/or diastolic >= 90
+rsd.pres <- RiskFactor("./who_raised_bp_sys_dia_140or90or_above.csv") %>%
+        filter(sex..code. == "BTSX") %>%
+        filter(gho..display. == "Raised blood pressure (SBP>=140 OR DBP>=90) (age-standardized estimate)")
+
+# Raised fasting blood glucose: bg >= 7.0 mmol/L or on medication
+rsd.gluc <- RiskFactor("./who_raised_fasting_glucose_7or_abode_or_on_meds.csv") %>%
+        filter(sex..code. == "BTSX") %>%
+        filter(gho..display. == "Raised fasting blood glucose (>=7.0 mmol/L or on medication)(age-standardized estimate)")
+
+t <- filter(rsd.gluc, !country..code. == "DNK") %>%
+        group_by(gho..display.) %>%
+        summarise(median(numeric), IQR(numeric))
+
+# Raised total cholesterol: cholesterol >= 190 mg/dl (5.0 mmol/L)
+rsd.clstrl <- RiskFactor("./who_raised_tot_choles_5or_above.csv") %>%
+        filter(sex..code. == "BTSX") %>%
+        filter(gho..display. == "Raised total cholesterol (>= 5.0 mmol/L) (age-standardized estimate)")
+
 # Probability of dying from any NCD ---------------------------------------
 # http://apps.who.int/gho/data/node.main.A857?lang=en
 
@@ -495,124 +614,3 @@ deaths.diabe <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 names(prob.dying.ncd) <- tolower(names(prob.dying.ncd))
 
 rm(dta)
-
-# Funktion: Risikofaktorer - mean --------------------------------------------------------------
-# http://apps.who.int/gho/data/node.main.A867?lang=en
-
-RiskFactor <- function(path) {
-        t <- read.csv(path, stringsAsFactor = FALSE)
-        t <- filter(t, COUNTRY..DISPLAY. %in% c("Denmark",
-                                             "Algeria",
-                                             "Egypt",
-                                             "Libya",
-                                             "Morocco",
-                                             "Sudan",
-                                             "Tunisia",
-                                             "Bahrain",
-                                             "United Arab Emirates",
-                                             "Iraq",
-                                             "Iran",
-                                             "Jordan",
-                                             "Kuwait",
-                                             "Lebanon",
-                                             "Oman",
-                                             "Saudi Arabia",
-                                             "Syrian Arab Republic",
-                                             "Turkey",
-                                             "Yemen",
-                                             "Qatar")) %>%
-                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
-                select(GHO..DISPLAY.,
-                       YEAR..CODE.,
-                       REGION..CODE.,
-                       COUNTRY..CODE.,
-                       COUNTRY..DISPLAY.,
-                       SEX..CODE.,
-                       Numeric,
-                       Low,
-                       High,
-                       Display.Value) %>%
-                arrange(Numeric)
-        names(t) <- tolower(names(t))
-        t
-}
-
-mean.bmi <- RiskFactor("./who_mean_bmi.csv") %>%
-        filter(sex..code. == "BTSX")
-
-mean.fasting.glucose <- RiskFactor("./who_mean_fasting_glucose.csv")
-
-mean.sys.bp <- RiskFactor("./who_mean_sys_bp.csv") %>%
-        filter(sex..code. == "BTSX")
-
-mean.colestrl <- RiskFactor("./who_mean_tot_cholest.csv")
-
-# Funktion: Risikofaktorer - procent af beflokning --------------------------------------------------------------
-# http://apps.who.int/gho/data/node.main.A867?lang=en
-
-RiskFactor <- function(path) {
-        t <- read.csv(path, stringsAsFactor = FALSE)
-        t <- filter(t, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                "Algeria",
-                                                "Egypt",
-                                                "Libya",
-                                                "Morocco",
-                                                "Sudan",
-                                                "Tunisia",
-                                                "Bahrain",
-                                                "United Arab Emirates",
-                                                "Iraq",
-                                                "Iran",
-                                                "Jordan",
-                                                "Kuwait",
-                                                "Lebanon",
-                                                "Oman",
-                                                "Saudi Arabia",
-                                                "Syrian Arab Republic",
-                                                "Turkey",
-                                                "Yemen",
-                                                "Qatar")) %>%
-                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
-                select(GHO..DISPLAY.,
-                       YEAR..CODE.,
-                       REGION..CODE.,
-                       COUNTRY..CODE.,
-                       COUNTRY..DISPLAY.,
-                       SEX..CODE.,
-                       Numeric,
-                       Low,
-                       High,
-                       Display.Value) %>%
-                arrange(Numeric)
-        names(t) <- tolower(names(t))
-        t
-}
-
-# Overweight: BMI >= 25
-overweight <- RiskFactor("./who_overweight_bmi25or_above.csv") %>%
-        filter(sex..code. == "BTSX")
-
-# Obesity: BMI >= 30
-obesity <- RiskFactor("./who_obesity_bmi30or_above.csv") %>%
-        filter(sex..code. == "BTSX")
-
-# Raised blood pressure: systolic >= 140 and/or diastolic >= 90
-rsd.pres <- RiskFactor("./who_raised_bp_sys_dia_140or90or_above.csv") %>%
-        filter(sex..code. == "BTSX") %>%
-        filter(gho..display. == "Raised blood pressure (SBP>=140 OR DBP>=90) (age-standardized estimate)")
-
-# Raised fasting blood glucose: bg >= 7.0 mmol/L or on medication
-rsd.gluc <- RiskFactor("./who_raised_fasting_glucose_7or_abode_or_on_meds.csv") %>%
-        filter(sex..code. == "BTSX") %>%
-        filter(gho..display. == "Raised fasting blood glucose (>=7.0 mmol/L or on medication)(age-standardized estimate)")
-
-t <- filter(rsd.gluc, !country..code. == "DNK") %>%
-        group_by(gho..display.) %>%
-        summarise(median(numeric), IQR(numeric))
-
-# Raised total cholesterol: cholesterol >= 190 mg/dl (5.0 mmol/L)
-rsd.clstrl <- RiskFactor("./who_raised_tot_choles_5or_above.csv") %>%
-        filter(sex..code. == "BTSX") %>%
-        filter(gho..display. == "Raised total cholesterol (>= 5.0 mmol/L) (age-standardized estimate)")
-
-
