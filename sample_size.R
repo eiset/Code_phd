@@ -5,7 +5,7 @@
 p = 0.16
 e = 0.05  # margin of error
 (n = qnorm(1-0.05/2)^2*p*(1-p)/e^2)
-#[1] 195.9144
+#[1] 206.5168
 
 
 # 2. Sample size needed for detecting a prevalence of 25 in the Middle Eastern
