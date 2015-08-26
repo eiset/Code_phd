@@ -14,7 +14,7 @@ e = 0.05  # margin of error
 p = 0.25
 e = 0.05  # margin of error
 (n = qnorm(1-0.05/2)^2*p*(1-p)/e^2)
-#[1] 245.8534
+#[1] 288.1094
 
 
 # The same calculations are the basis of the sample size calculation for study c)
