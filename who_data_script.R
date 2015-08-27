@@ -6,7 +6,8 @@
 # data can be handled online though I have chosen to download the data for
 # later documentation.
 
-# The source of the data (URL) is given for each variable.
+# The source of the data (URL) is given for each variable. They were all accessed and 
+# data downloaded on the date given above.
 
 library(dplyr)
 
