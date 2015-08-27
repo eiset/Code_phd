@@ -1,3 +1,7 @@
+### Sample size calculations given under study b) and c)
+
+# Normal approximation is assumed
+
 # Study b):
 # 1. Sample size needed for detecting a prevalence of 16 in the Middle Eastern
 # refugee population.
