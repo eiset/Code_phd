@@ -6,6 +6,8 @@
 # data can be handled online though I have chosen to download the data for
 # later documentation.
 
+# The source of the data (URL) is given for each variable.
+
 library(dplyr)
 
 # Funktion: Risikofaktorer - mean --------------------------------------------------------------
