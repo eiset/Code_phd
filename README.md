@@ -5,4 +5,4 @@ This repository contains code for the calculations made in my PhD-application as
 Contains code for the calculated sample size. 
 
 ####"who_data_script.R" 
-Contains code for the calculated prevalences, means etc.
+Contains code for the calculated prevalences, means etc. The source of the data is included directly for each variable.
