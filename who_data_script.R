@@ -494,7 +494,7 @@ deaths.cancer <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
                Numeric) %>%
         arrange(Numeric)
 
-names(prob.dying.ncd) <- tolower(names(prob.dying.ncd))
+names(deaths.cancer) <- tolower(names(deaths.cancer))
 
 rm(dta)
 
@@ -533,7 +533,7 @@ deaths.cvd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
                Numeric) %>%
         arrange(Numeric)
 
-names(prob.dying.ncd) <- tolower(names(prob.dying.ncd))
+names(deaths.cvd) <- tolower(names(deaths.cvd))
 
 rm(dta)
 
@@ -572,7 +572,7 @@ deaths.crd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
                Numeric) %>%
         arrange(Numeric)
 
-names(prob.dying.ncd) <- tolower(names(prob.dying.ncd))
+names(deaths.crd) <- tolower(names(deaths.crd))
 
 rm(dta)
 
@@ -611,6 +611,6 @@ deaths.diabe <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
                Numeric) %>%
         arrange(Numeric)
 
-names(prob.dying.ncd) <- tolower(names(prob.dying.ncd))
+names(deaths.diabe) <- tolower(names(deaths.diabe))
 
 rm(dta)
