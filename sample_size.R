@@ -1,7 +1,5 @@
 ### Sample size calculations given under study b) and c)
 
-# Normal approximation is assumed
-
 # Study b):
 # 1. Sample size needed for detecting a prevalence of 16 in the Middle Eastern
 # refugee population.
@@ -22,3 +20,7 @@ e = 0.05  # margin of error
 
 
 # The same calculations are the basis of the sample size calculation for study c)
+
+# Normal approximation is assumed. To formally check this n and n * (1-p) must both be greater than 5. 
+# n = 206.52 and n * (1-0.16) = 173.47. 
+
