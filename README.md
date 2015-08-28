@@ -1,4 +1,4 @@
-# Calculation and documentation, PhD-application
+# Calculations and documentation, PhD-application
 This repository contains code for the calculations made in my PhD-application as well as documentation of the datamaterial.
 
 ####"sample_size.R" 
