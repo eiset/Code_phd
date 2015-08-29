@@ -323,39 +323,21 @@ tb.prev.tot <- filter(tb, !country..code. == "DNK") %>%
 # Deaths pr. 100,000 all NCDs --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A863?lang=en
 
-dta <- read.csv("./who_all_ncd_deaths.csv",
-                stringsAsFactors = FALSE)
-
-deaths.all.ncd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                       "Algeria",
-                                                       "Egypt",
-                                                       "Libya",
-                                                       "Morocco",
-                                                       "Sudan",
-                                                       "Tunisia",
-                                                       "Bahrain",
-                                                       "United Arab Emirates",
-                                                       "Iraq",
-                                                       "Iran",
-                                                       "Jordan",
-                                                       "Kuwait",
-                                                       "Lebanon",
-                                                       "Oman",
-                                                       "Saudi Arabia",
-                                                       "Syrian Arab Republic",
-                                                       "Turkey",
-                                                       "Yemen",
-                                                       "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
-        select(GHO..DISPLAY.,
-               YEAR..CODE.,
-               REGION..CODE.,
-               COUNTRY..CODE.,
-               COUNTRY..DISPLAY.,
-               SEX..CODE.,
-               Numeric) %>%
-        filter(SEX..CODE. == "BTSX") %>%
-        arrange(Numeric)
+deaths.all.ncd <- read.csv("./who_all_ncd_deaths.csv",
+                stringsAsFactors = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                        YEAR..CODE.,
+                        REGION..CODE.,
+                        COUNTRY..CODE.,
+                        COUNTRY..DISPLAY.,
+                        SEX..CODE.,
+                        Numeric) %>%
+                filter(SEX..CODE. == "BTSX") %>%
+                arrange(Numeric)
 
 names(deaths.all.ncd) <- tolower(names(deaths.all.ncd))
 
@@ -364,37 +346,19 @@ rm(dta)
 # Deaths pr. 100,000: Cancer --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A864?lang=en
 
-dta <- read.csv("./who_cancer_deaths.csv",
-                stringsAsFactors = FALSE)
-
-deaths.cancer <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                       "Algeria",
-                                                       "Egypt",
-                                                       "Libya",
-                                                       "Morocco",
-                                                       "Sudan",
-                                                       "Tunisia",
-                                                       "Bahrain",
-                                                       "United Arab Emirates",
-                                                       "Iraq",
-                                                       "Iran",
-                                                       "Jordan",
-                                                       "Kuwait",
-                                                       "Lebanon",
-                                                       "Oman",
-                                                       "Saudi Arabia",
-                                                       "Syrian Arab Republic",
-                                                       "Turkey",
-                                                       "Yemen",
-                                                       "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
-        select(GHO..DISPLAY.,
-               YEAR..CODE.,
-               REGION..CODE.,
-               COUNTRY..CODE.,
-               COUNTRY..DISPLAY.,
-               Numeric) %>%
-        arrange(Numeric)
+deaths.cancer <- read.csv("./who_all_ncd_deaths.csv",
+                stringsAsFactors = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                        YEAR..CODE.,
+                        REGION..CODE.,
+                        COUNTRY..CODE.,
+                        COUNTRY..DISPLAY.,
+                        Numeric) %>%
+                arrange(Numeric)
 
 names(deaths.cancer) <- tolower(names(deaths.cancer))
 
@@ -403,37 +367,19 @@ rm(dta)
 # Deaths pr. 100,000: Cardiovascular --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A865CARDIOVASCULAR?lang=en
 
-dta <- read.csv("./who_cardiovas_deaths.csv",
-                stringsAsFactors = FALSE)
-
-deaths.cvd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                       "Algeria",
-                                                       "Egypt",
-                                                       "Libya",
-                                                       "Morocco",
-                                                       "Sudan",
-                                                       "Tunisia",
-                                                       "Bahrain",
-                                                       "United Arab Emirates",
-                                                       "Iraq",
-                                                       "Iran",
-                                                       "Jordan",
-                                                       "Kuwait",
-                                                       "Lebanon",
-                                                       "Oman",
-                                                       "Saudi Arabia",
-                                                       "Syrian Arab Republic",
-                                                       "Turkey",
-                                                       "Yemen",
-                                                       "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
-        select(GHO..DISPLAY.,
-               YEAR..CODE.,
-               REGION..CODE.,
-               COUNTRY..CODE.,
-               COUNTRY..DISPLAY.,
-               Numeric) %>%
-        arrange(Numeric)
+deaths.cvd <- read.csv("./who_all_ncd_deaths.csv",
+                stringsAsFactors = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                        YEAR..CODE.,
+                        REGION..CODE.,
+                        COUNTRY..CODE.,
+                        COUNTRY..DISPLAY.,
+                        Numeric) %>%
+                arrange(Numeric)
 
 names(deaths.cvd) <- tolower(names(deaths.cvd))
 
@@ -442,37 +388,19 @@ rm(dta)
 # Deaths pr. 100,000: Cronic respiratory disease --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A866?lang=en
 
-dta <- read.csv("./who_crd_deaths.csv",
-                stringsAsFactors = FALSE)
-
-deaths.crd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                       "Algeria",
-                                                       "Egypt",
-                                                       "Libya",
-                                                       "Morocco",
-                                                       "Sudan",
-                                                       "Tunisia",
-                                                       "Bahrain",
-                                                       "United Arab Emirates",
-                                                       "Iraq",
-                                                       "Iran",
-                                                       "Jordan",
-                                                       "Kuwait",
-                                                       "Lebanon",
-                                                       "Oman",
-                                                       "Saudi Arabia",
-                                                       "Syrian Arab Republic",
-                                                       "Turkey",
-                                                       "Yemen",
-                                                       "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
-        select(GHO..DISPLAY.,
-               YEAR..CODE.,
-               REGION..CODE.,
-               COUNTRY..CODE.,
-               COUNTRY..DISPLAY.,
-               Numeric) %>%
-        arrange(Numeric)
+deaths.crd <- read.csv("./who_all_ncd_deaths.csv",
+                stringsAsFactors = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                        YEAR..CODE.,
+                        REGION..CODE.,
+                        COUNTRY..CODE.,
+                        COUNTRY..DISPLAY.,
+                        Numeric) %>%
+                arrange(Numeric)
 
 names(deaths.crd) <- tolower(names(deaths.crd))
 
@@ -481,37 +409,19 @@ rm(dta)
 # Deaths pr. 100,000: Diabetes --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A865DIABETES?lang=en
 
-dta <- read.csv("./who_diabetes_deaths.csv",
-                stringsAsFactors = FALSE)
-
-deaths.diabe <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                       "Algeria",
-                                                       "Egypt",
-                                                       "Libya",
-                                                       "Morocco",
-                                                       "Sudan",
-                                                       "Tunisia",
-                                                       "Bahrain",
-                                                       "United Arab Emirates",
-                                                       "Iraq",
-                                                       "Iran",
-                                                       "Jordan",
-                                                       "Kuwait",
-                                                       "Lebanon",
-                                                       "Oman",
-                                                       "Saudi Arabia",
-                                                       "Syrian Arab Republic",
-                                                       "Turkey",
-                                                       "Yemen",
-                                                       "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
-        select(GHO..DISPLAY.,
-               YEAR..CODE.,
-               REGION..CODE.,
-               COUNTRY..CODE.,
-               COUNTRY..DISPLAY.,
-               Numeric) %>%
-        arrange(Numeric)
+deaths.diabe <- read.csv("./who_all_ncd_deaths.csv",
+                stringsAsFactors = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+                filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
+                select(GHO..DISPLAY.,
+                        YEAR..CODE.,
+                        REGION..CODE.,
+                        COUNTRY..CODE.,
+                        COUNTRY..DISPLAY.,
+                        Numeric) %>%
+                arrange(Numeric)
 
 names(deaths.diabe) <- tolower(names(deaths.diabe))
 
