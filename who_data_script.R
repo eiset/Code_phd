@@ -16,12 +16,23 @@ library(tidyr)
 # http://data.worldbank.org/about/country-and-lending-groups
 # Accessed 26. August 2015
 
+# To limit variation within in the study inclusion criteria are adults from 
+# low and middle income countries in the region defined by The World Bank as 
+# "Middle East & North Africa"
+
 countries <- read.csv2("./country_class.csv") %>%
         select(- c(1, 2, 5, 8:11)) %>%
         slice(-1) %>%
         filter(Region == "Middle East & North Africa") %>%
-        filter(! grepl("^[Hh]igh", .$Income.group)) %>%
+        filter(!grepl("^[Hh]igh", .$Income.group)) %>%
         sapply(., gsub, pattern = ",.*", replacement = "")
+        
+# Thus, adults from the following countries are included
+#[1] "Algeria"              "Djibouti"             "Egypt"               
+#[4] "Iran"                 "Iraq"                 "Jordan"              
+#[7] "Lebanon"              "Libya"                "Morocco"             
+#[10] "Syrian Arab Republic" "Tunisia"              "West Bank and Gaza"  
+#[13] "Yemen"
 
 # Population census of selected countries in 2014 --------------------------------
 # http://databank.worldbank.org/data/reports.aspx?Code=SP.POP.TOTL&id=af3ce82b&report_name=Popular_indicators&populartype=series&ispopular=y#
