@@ -1,41 +1,53 @@
-# Global health observatory data repository
-# http://apps.who.int/gho/data/?theme=home
+# Global health observatory data repository & World DataBank
 # Accessed July 30. 2015
 
 # Use setwd() to go to the directory where the data has been stored. Alternatively
 # data can be handled online though I have chosen to download the data for
 # later documentation.
 
-# The source of the data (URL) is given for each variable. They were all accessed and 
+# The source of the data (URL) is given for each variable. They were all accessed and
 # data downloaded on the date given above.
 
 library(dplyr)
+library(tidyr)
+
+
+# Selecting low and middle income Middle Eastern countries ----------------
+# http://data.worldbank.org/about/country-and-lending-groups
+# Accessed 26. August 2015
+
+countries <- read.csv2("./country_class.csv") %>%
+        select(- c(1, 2, 5, 8:11)) %>%
+        slice(-1) %>%
+        filter(Region == "Middle East & North Africa") %>%
+        filter(! grepl("^[Hh]igh", .$Income.group)) %>%
+        sapply(., gsub, pattern = ",.*", replacement = "")
+
+# Population census of selected countries in 2014 --------------------------------
+# http://databank.worldbank.org/data/reports.aspx?Code=SP.POP.TOTL&id=af3ce82b&report_name=Popular_indicators&populartype=series&ispopular=y#
+pop <- read.csv("./pop.tot.csv") %>%
+        gather(year, freq, -c(1:4)) %>%
+        setNames(tolower(names(.))) %>%
+        mutate(country.name = gsub(", Islamic Rep.", "", fixed = TRUE,
+                                   .$country.name)) %>%
+        mutate(country.name = gsub(", Arab Rep.", "", fixed = TRUE,
+                                   .$country.name)) %>%
+        mutate(country.name = gsub(", Rep.", "", fixed = TRUE,
+                                   .$country.name)) %>%
+        filter(country.name %in% countries[, 1])
+pop <- data.frame(sapply(pop, gsub, pattern = "^X", replacement = "")) %>%
+        mutate(freq = as.numeric(levels(freq)[freq])) %>%
+        group_by(country.name) %>%
+        summarise(pop14 = max(freq, na.rm = TRUE))
 
 # Funktion: Risikofaktorer - mean --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A867?lang=en
 
 RiskFactor <- function(path) {
-        t <- read.csv(path, stringsAsFactor = FALSE)
-        t <- filter(t, COUNTRY..DISPLAY. %in% c("Denmark",
-                                             "Algeria",
-                                             "Egypt",
-                                             "Libya",
-                                             "Morocco",
-                                             "Sudan",
-                                             "Tunisia",
-                                             "Bahrain",
-                                             "United Arab Emirates",
-                                             "Iraq",
-                                             "Iran",
-                                             "Jordan",
-                                             "Kuwait",
-                                             "Lebanon",
-                                             "Oman",
-                                             "Saudi Arabia",
-                                             "Syrian Arab Republic",
-                                             "Turkey",
-                                             "Yemen",
-                                             "Qatar")) %>%
+        t <- read.csv(path, stringsAsFactor = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                                "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
                 filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
                 select(GHO..DISPLAY.,
                        YEAR..CODE.,
@@ -62,31 +74,15 @@ mean.sys.bp <- RiskFactor("./who_mean_sys_bp.csv") %>%
 
 mean.colestrl <- RiskFactor("./who_mean_tot_cholest.csv")
 
-# Funktion: Risikofaktorer - procent af beflokning --------------------------------------------------------------
+# Funktion: Risikofaktorer - prevalence --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A867?lang=en
+# The prevalence is defined as the percent of defined population with the risk factor
 
 RiskFactor <- function(path) {
-        t <- read.csv(path, stringsAsFactor = FALSE)
-        t <- filter(t, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                "Algeria",
-                                                "Egypt",
-                                                "Libya",
-                                                "Morocco",
-                                                "Sudan",
-                                                "Tunisia",
-                                                "Bahrain",
-                                                "United Arab Emirates",
-                                                "Iraq",
-                                                "Iran",
-                                                "Jordan",
-                                                "Kuwait",
-                                                "Lebanon",
-                                                "Oman",
-                                                "Saudi Arabia",
-                                                "Syrian Arab Republic",
-                                                "Turkey",
-                                                "Yemen",
-                                                "Qatar")) %>%
+        t <- read.csv(path, stringsAsFactor = FALSE) %>%
+                mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                                "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+                filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
                 filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
                 select(GHO..DISPLAY.,
                        YEAR..CODE.,
@@ -120,10 +116,36 @@ rsd.pres <- RiskFactor("./who_raised_bp_sys_dia_140or90or_above.csv") %>%
 rsd.gluc <- RiskFactor("./who_raised_fasting_glucose_7or_abode_or_on_meds.csv") %>%
         filter(sex..code. == "BTSX") %>%
         filter(gho..display. == "Raised fasting blood glucose (>=7.0 mmol/L or on medication)(age-standardized estimate)")
+rsd.gluc[, c(5, 10)]
 
-t <- filter(rsd.gluc, !country..code. == "DNK") %>%
-        group_by(gho..display.) %>%
-        summarise(median(numeric), IQR(numeric))
+#      country..display.    display.value
+#1               Denmark    5.2 [2.5-7.8]
+#2              Djibouti   8.7 [4.2-13.5]
+#3                  Iran  12.2 [7.3-16.8]
+#4               Lebanon  12.6 [7.1-17.8]
+#5               Tunisia  13.3 [8.0-18.4]
+#6               Morocco  13.5 [7.6-19.0]
+#7  Syrian Arab Republic  13.9 [8.3-19.2]
+#8               Algeria  14.2 [8.7-19.6]
+#9                Jordan  14.9 [8.8-21.0]
+#10                Yemen  15.5 [9.4-22.5]
+#11                 Iraq 16.8 [11.0-22.7]
+#12                Libya 17.0 [10.7-23.1]
+#13                Egypt 18.9 [12.5-25.3]
+
+
+# An estimate of the combined prevalence in the selected countries
+
+rsd.gluc.prev.tot <- left_join(pop, rsd.gluc, by = c("country.name" = "country..display.")) %>%
+        mutate(prev = numeric / 100) %>%
+        group_by(country.name) %>%
+        summarise(cases = pop14 * prev, pop = pop14) %>%
+        ungroup() %>%
+        na.omit() %>%
+        summarise(tot.cases = sum(cases), tot.pop = sum(pop))
+summarise(rsd.gluc.prev.tot, pre.tot = tot.cases / tot.pop)
+# prev.tot
+# 1 0.1514005
 
 # Raised total cholesterol: cholesterol >= 190 mg/dl (5.0 mmol/L)
 rsd.clstrl <- RiskFactor("./who_raised_tot_choles_5or_above.csv") %>%
@@ -133,30 +155,12 @@ rsd.clstrl <- RiskFactor("./who_raised_tot_choles_5or_above.csv") %>%
 # Probability of dying from any NCD ---------------------------------------
 # http://apps.who.int/gho/data/node.main.A857?lang=en
 
-dta <- read.csv("./who_risk_of_death_ncd.csv",
-                           stringsAsFactors = FALSE)
-
-prob.dying.ncd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                     "Algeria",
-                                     "Egypt",
-                                     "Libya",
-                                     "Morocco",
-                                     "Sudan",
-                                     "Tunisia",
-                                     "Bahrain",
-                                     "United Arab Emirates",
-                                     "Iraq",
-                                     "Iran",
-                                     "Jordan",
-                                     "Kuwait",
-                                     "Lebanon",
-                                     "Oman",
-                                     "Saudi Arabia",
-                                     "Syrian Arab Republic",
-                                     "Turkey",
-                                     "Yemen",
-                                     "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
+prob.dying.ncd <- read.csv("./who_risk_of_death_ncd.csv",
+                           stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+        filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
         select(GHO..DISPLAY.,
                YEAR..CODE.,
                REGION..CODE.,
@@ -167,36 +171,16 @@ prob.dying.ncd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(prob.dying.ncd) <- tolower(names(prob.dying.ncd))
 
-rm(dta)
-
 # qplot(country..code., numeric, data = deaths.all.ncd)
 
 # Prevalence: tobacco use -------------------------------------------------
 # http://apps.who.int/gho/data/node.main.1250?lang=en
 
-dta <- read.csv("./who_preval_tobacco.csv",
-                stringsAsFactors = FALSE)
-
-tobac <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                       "Algeria",
-                                                       "Egypt",
-                                                       "Libya",
-                                                       "Morocco",
-                                                       "Sudan",
-                                                       "Tunisia",
-                                                       "Bahrain",
-                                                       "United Arab Emirates",
-                                                       "Iraq",
-                                                       "Iran",
-                                                       "Jordan",
-                                                       "Kuwait",
-                                                       "Lebanon",
-                                                       "Oman",
-                                                       "Saudi Arabia",
-                                                       "Syrian Arab Republic",
-                                                       "Turkey",
-                                                       "Yemen",
-                                                       "Qatar")) %>%
+tobac <- read.csv("./who_preval_tobacco.csv",
+                  stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark"))  %>%
         filter(GHO..DISPLAY. == "Current smoking of any tobacco product (age-standardized rate)") %>%
         filter(SEX..CODE. == "BTSX") %>%
         select(GHO..DISPLAY.,
@@ -209,35 +193,15 @@ tobac <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(tobac) <- tolower(names(tobac))
 
-rm(dta)
-
 # Distribution of years of life lost (%) ----------------------------------
 # http://apps.who.int/gho/data/node.main.21?lang=en
 
-dta <- read.csv("./who_distribution_of_years_of_life_lost.csv",
-                stringsAsFactors = FALSE)
-
-yll <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                              "Algeria",
-                                              "Egypt",
-                                              "Libya",
-                                              "Morocco",
-                                              "Sudan",
-                                              "Tunisia",
-                                              "Bahrain",
-                                              "United Arab Emirates",
-                                              "Iraq",
-                                              "Iran",
-                                              "Jordan",
-                                              "Kuwait",
-                                              "Lebanon",
-                                              "Oman",
-                                              "Saudi Arabia",
-                                              "Syrian Arab Republic",
-                                              "Turkey",
-                                              "Yemen",
-                                              "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
+yll <- read.csv("./who_distribution_of_years_of_life_lost.csv",
+                stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+        filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
         select(GHO..DISPLAY.,
                YEAR..CODE.,
                REGION..CODE.,
@@ -249,35 +213,15 @@ yll <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(yll) <- tolower(names(yll))
 
-rm(dta)
-
 # Mortality rate pr. 100,000, age-standardised, 3 grp. --------------------
 # http://apps.who.int/gho/data/node.main.18?lang=en
 
-dta <- read.csv("./who_death_rate_major_groups.csv",
-                stringsAsFactors = FALSE)
-
-mort.rate <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                            "Algeria",
-                                            "Egypt",
-                                            "Libya",
-                                            "Morocco",
-                                            "Sudan",
-                                            "Tunisia",
-                                            "Bahrain",
-                                            "United Arab Emirates",
-                                            "Iraq",
-                                            "Iran",
-                                            "Jordan",
-                                            "Kuwait",
-                                            "Lebanon",
-                                            "Oman",
-                                            "Saudi Arabia",
-                                            "Syrian Arab Republic",
-                                            "Turkey",
-                                            "Yemen",
-                                            "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
+mort.rate <- read.csv("./who_death_rate_major_groups.csv",
+                      stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+        filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
         select(GHO..DISPLAY.,
                YEAR..CODE.,
                REGION..CODE.,
@@ -289,35 +233,18 @@ mort.rate <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(mort.rate) <- tolower(names(mort.rate))
 
-rm(dta)
-
 # DALYs -------------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.DALYCTRY?lang=en
 
 dta <- read.csv("./who_daly.csv",
                 stringsAsFactors = FALSE)
 
-daly <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                                  "Algeria",
-                                                  "Egypt",
-                                                  "Libya",
-                                                  "Morocco",
-                                                  "Sudan",
-                                                  "Tunisia",
-                                                  "Bahrain",
-                                                  "United Arab Emirates",
-                                                  "Iraq",
-                                                  "Iran",
-                                                  "Jordan",
-                                                  "Kuwait",
-                                                  "Lebanon",
-                                                  "Oman",
-                                                  "Saudi Arabia",
-                                                  "Syrian Arab Republic",
-                                                  "Turkey",
-                                                  "Yemen",
-                                                  "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
+daly <- read.csv("./who_daly.csv",
+                 stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+        filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
         select(GHO..DISPLAY.,
                YEAR..CODE.,
                REGION..CODE.,
@@ -329,35 +256,15 @@ daly <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(daly) <- tolower(names(daly))
 
-rm(dta)
-
 # Number of reported cases of selected CDs --------------------------------
 # http://apps.who.int/gho/data/node.main.31?lang=en
 
-dta <- read.csv("./who_CD_number_of_cases.csv",
-                stringsAsFactors = FALSE)
-
-nbr.cd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                             "Algeria",
-                                             "Egypt",
-                                             "Libya",
-                                             "Morocco",
-                                             "Sudan",
-                                             "Tunisia",
-                                             "Bahrain",
-                                             "United Arab Emirates",
-                                             "Iraq",
-                                             "Iran",
-                                             "Jordan",
-                                             "Kuwait",
-                                             "Lebanon",
-                                             "Oman",
-                                             "Saudi Arabia",
-                                             "Syrian Arab Republic",
-                                             "Turkey",
-                                             "Yemen",
-                                             "Qatar")) %>%
-        filter(YEAR..CODE. == 2012) %>%
+nbr.cd <- read.csv("./who_CD_number_of_cases.csv",
+                   stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+        filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
         select(GHO..DISPLAY.,
                YEAR..CODE.,
                REGION..CODE.,
@@ -368,8 +275,6 @@ nbr.cd <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(nbr.cd) <- tolower(names(nbr.cd))
 
-rm(dta)
-
 d <- group_by(nbr.cd, gho..display.) %>%
         filter(! country..code. == "DNK") %>%
         summarise(nbr = sum(numeric, na.rm = TRUE)) %>%
@@ -377,31 +282,14 @@ d <- group_by(nbr.cd, gho..display.) %>%
 
 # Mortality + prevalence: Tuberculosis ------------------------------------
 # http://apps.who.int/gho/data/node.main.1317?lang=en
+# The prevalence is defined as cases per 100,000 populations
 
-dta <- read.csv("./who_tb.csv",
-                stringsAsFactors = FALSE)
-
-tb <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
-                                               "Algeria",
-                                               "Egypt",
-                                               "Libya",
-                                               "Morocco",
-                                               "Sudan",
-                                               "Tunisia",
-                                               "Bahrain",
-                                               "United Arab Emirates",
-                                               "Iraq",
-                                               "Iran",
-                                               "Jordan",
-                                               "Kuwait",
-                                               "Lebanon",
-                                               "Oman",
-                                               "Saudi Arabia",
-                                               "Syrian Arab Republic",
-                                               "Turkey",
-                                               "Yemen",
-                                               "Qatar")) %>%
-        filter(YEAR..CODE. == 2013) %>%
+tb <- read.csv("./who_tb.csv",
+               stringsAsFactor = FALSE) %>%
+        mutate(COUNTRY..DISPLAY. = gsub(" (Islamic Republic of)",
+                                        "", fixed = TRUE, .$COUNTRY..DISPLAY.)) %>%
+        filter(COUNTRY..DISPLAY. %in% c(countries[, 1], "Denmark")) %>%
+        filter(YEAR..CODE. == max(YEAR..CODE.)) %>%
         select(GHO..DISPLAY.,
                YEAR..CODE.,
                REGION..CODE.,
@@ -415,9 +303,9 @@ tb <- filter(dta, COUNTRY..DISPLAY. %in% c("Denmark",
 
 names(tb) <- tolower(names(tb))
 
-rm(dta)
+# An estimate of the combined prevalence in the selected countries
 
-t <- filter(tb, !country..code. == "DNK") %>%
+tb.prev.tot <- filter(tb, !country..code. == "DNK") %>%
         group_by(gho..display.) %>%
         summarise(median(numeric), IQR(numeric))
 
