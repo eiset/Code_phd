@@ -12,7 +12,7 @@ e = 0.05  # margin of error
 #[1] 195.9144
 
 
-# 2. Sample size needed for detecting a prevalence of 25 in the Middle Eastern
+# 2. Sample size needed for detecting a prevalence of 20 in the Middle Eastern
 # refugee population.
 
 p = 0.20
