@@ -341,8 +341,6 @@ deaths.all.ncd <- read.csv("./who_all_ncd_deaths.csv",
 
 names(deaths.all.ncd) <- tolower(names(deaths.all.ncd))
 
-rm(dta)
-
 # Deaths pr. 100,000: Cancer --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A864?lang=en
 
@@ -361,8 +359,6 @@ deaths.cancer <- read.csv("./who_all_ncd_deaths.csv",
                 arrange(Numeric)
 
 names(deaths.cancer) <- tolower(names(deaths.cancer))
-
-rm(dta)
 
 # Deaths pr. 100,000: Cardiovascular --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A865CARDIOVASCULAR?lang=en
@@ -383,8 +379,6 @@ deaths.cvd <- read.csv("./who_all_ncd_deaths.csv",
 
 names(deaths.cvd) <- tolower(names(deaths.cvd))
 
-rm(dta)
-
 # Deaths pr. 100,000: Cronic respiratory disease --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A866?lang=en
 
@@ -404,8 +398,6 @@ deaths.crd <- read.csv("./who_all_ncd_deaths.csv",
 
 names(deaths.crd) <- tolower(names(deaths.crd))
 
-rm(dta)
-
 # Deaths pr. 100,000: Diabetes --------------------------------------------------------------
 # http://apps.who.int/gho/data/node.main.A865DIABETES?lang=en
 
@@ -424,5 +416,3 @@ deaths.diabe <- read.csv("./who_all_ncd_deaths.csv",
                 arrange(Numeric)
 
 names(deaths.diabe) <- tolower(names(deaths.diabe))
-
-rm(dta)
