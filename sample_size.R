@@ -1,4 +1,6 @@
-### Sample size calculations given under study b) and c)
+# Sample size calculations given under study b) and c). 
+
+# The formula used is given in, amongst other, "Epidemiology: Study Design and Data Analysis" by Mark Woodward.
 
 # Study b):
 # 1. Sample size needed for detecting a prevalence of 15% in the Middle Eastern
@@ -24,5 +26,5 @@ e = 0.05  # margin of error
 # Normal approximation is assumed. To formally check this n and n * (1-p) must both be greater than 5.
 # n = 185.0047 and n * (1-0.14) = 159.104.
 
-# The formula used is given in, amongst other, "Epidemiology: Study Design and Data Analysis" by Mark Woodward.
+
 
