@@ -1,16 +1,17 @@
 # Global health observatory data repository & World DataBank
 # Accessed July 30. 2015
 
+# The source of the data (URL) is given for each variable. They were all accessed and
+# data downloaded on the date given above.
+
+
+
 # Use setwd() to go to the directory where the data has been stored. Alternatively
 # data can be handled online though I have chosen to download the data for
 # later documentation.
 
-# The source of the data (URL) is given for each variable. They were all accessed and
-# data downloaded on the date given above.
-
 library(dplyr)
 library(tidyr)
-
 
 # Selecting low and middle income Middle Eastern countries ----------------
 # http://data.worldbank.org/about/country-and-lending-groups
