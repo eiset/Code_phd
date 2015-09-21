@@ -17,7 +17,7 @@ library(tidyr)
 # http://data.worldbank.org/about/country-and-lending-groups
 # Accessed 26. August 2015
 
-# To limit variation within in the study inclusion criteria are adults from 
+# To limit variation in the study inclusion criteria are adults from 
 # low and middle income countries in the region defined by The World Bank as 
 # "Middle East & North Africa"
 
